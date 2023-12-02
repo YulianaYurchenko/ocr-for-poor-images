@@ -80,17 +80,36 @@ def cut_image_into_text_lines(image: np.ndarray,
 
 def cut_image_into_text_lines_new(image: np.ndarray) -> List[np.ndarray]:
 
+    plt.figure(figsize=(12, 5))
     x = np.mean(1 - image, axis=1) / np.mean(1 - image)
+    plt.plot(x, 'b--', label='к-сть чорного кольору')
     kernel = image.shape[0] // 20
     x = np.convolve(x, np.ones(kernel) / kernel, mode='same')
+    plt.plot(x, 'b', label='згладжений сигнал к-сті чорного кольору')
 
     peaks, _ = find_peaks(x, height=0.75, prominence=0.3, width=image.shape[0] // 20)
     cut_indices = (peaks[1:] + peaks[:-1]) // 2
     cut_indices = np.insert(cut_indices, 0, 0)
     cut_indices = np.append(cut_indices, image.shape[0])
+    for i, p in enumerate(peaks):
+        if i == 0:
+            plt.scatter(p, x[p], color='r', s=100, label='точки локального максимуму')
+        plt.scatter(p, x[p], color='r', s=100)
+
+    for i, c in enumerate(cut_indices):
+        if i == 0:
+            plt.axvline(c, color='r', linestyle='dashed', label='місця розрізання зображення')
+        plt.axvline(c, color='r', linestyle='dashed')
+
+    plt.legend(prop={'size': 14})
+    plt.grid()
+    plt.xlabel('номер рядка зображення', fontsize=14)
+    plt.ylabel('сумарна кількість чорного кольору', fontsize=14)
+    plt.savefig('data/sample_images/plot.png')
+
 
     single_line_images = []
     for i1, i2 in zip(cut_indices[:-1], cut_indices[1:]):
         single_line_images.append(image[i1: i2])
 
-    return single_line_images, len(peaks)
+    return single_line_images

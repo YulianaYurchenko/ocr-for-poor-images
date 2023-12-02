@@ -8,7 +8,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import load_model
 
-from preprocessing_tools import encode_single_image, decode_batch_predictions, img_width, img_height
+from preprocessing_tools import encode_single_image, decode_batch_predictions, IMG_WIDTH, IMG_HEIGHT
 
 
 class SingleLineModel(OCRModel):
@@ -45,9 +45,9 @@ class SingleLineModel(OCRModel):
         # 1. Convert to grayscale
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         # 2. Resize to suit the model
-        image = cv.resize(image, (img_width, img_height))
+        image = cv.resize(image, (IMG_WIDTH, IMG_HEIGHT))
         # 3. Some more preprocessing
         image = encode_single_image(image)
         # 4. Batch size = 1
-        image = tf.reshape(image, [1, img_width, img_height, 1])
+        image = tf.reshape(image, [1, IMG_WIDTH, IMG_HEIGHT, 1])
         return image
